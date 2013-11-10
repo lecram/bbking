@@ -6,6 +6,8 @@
 #define MIN(A, B) ((A) < (B)) ? (A) : (B)
 #define MAX(A, B) ((A) > (B)) ? (A) : (B)
 
+#define INPUT_LEN 256
+
 typedef enum {DEFAULT, RED, GREEN, YELLOW, BLUE, CYAN, MAGENTA, WHITE} Color;
 
 #define BB_NORMAL   COLOR_PAIR(DEFAULT)
@@ -324,20 +326,39 @@ bb_op_add(char *a, char *b)
     return anim;
 }
 
+void
+input(char buffer[], int maxlen)
+{
+    int i;
+
+    nocbreak();
+    echo();
+    curs_set(TRUE);
+    mvgetnstr(LINES - 2, 0, buffer, maxlen - 1);
+    for (i = 0; i < COLS; i++)
+        mvaddch(LINES - 2, i, ' ');
+    cbreak();
+    noecho();
+    curs_set(FALSE);
+}
+
 int
 main(int argc, char *argv[])
 {
+    char a[INPUT_LEN];
+    char b[INPUT_LEN];
     Board *board;
 
     bb_init();
 
     board = bb_newboard(LINES, COLS);
 
-    bb_addnode(board, bb_op_add("123", "456"));
-    bb_addnode(board, bb_op_add("999", "999"));
-    bb_addnode(board, bb_op_add("789", "103452"));
-
-    bb_playboard(board);
+    while (1) {
+        input(a, INPUT_LEN);
+        input(b, INPUT_LEN);
+        bb_addnode(board, bb_op_add(a, b));
+        bb_playboard(board);
+    }
 
     bb_delboard(board);
     return 0;
