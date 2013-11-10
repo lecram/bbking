@@ -1,5 +1,11 @@
-CFLAGS = -Wall -Werror -std=c89 -O0 -g
 CLINK = -lncurses
+CFLAGS = -Wall -Werror -std=c89
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+    CFLAGS += -O0 -g
+else
+    CFLAGS += -O2
+endif
 
 objects = anim.o board.o bbk.o
 
