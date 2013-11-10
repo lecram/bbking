@@ -180,10 +180,29 @@ bb_addnode(Board *board, Anim *anim)
 }
 
 void
-bb_playboard(Board *board)
+bb_playboard(Board *board, int skip)
 {
     int delta = 1;
-    Node *node = board->first;
+    WINDOW *win;
+    Node *node;
+    erase();
+    node = board->first;
+    while (skip--) {
+        win = subwin(
+          stdscr,
+          node->anim->height,
+          node->anim->width,
+          node->begin_y,
+          node->begin_x
+        );
+        touchwin(win);
+        mvwin(node->anim->last->win, node->begin_y, node->begin_x);
+        overwrite(node->anim->last->win, win);
+        mvwin(node->anim->last->win, -node->begin_y, -node->begin_x);
+        wrefresh(win);
+        node = node->next;
+        delwin(win);
+    }
     while (node != NULL) {
         delta = bb_playanim(
           node->anim,
@@ -345,6 +364,7 @@ input(char buffer[], int maxlen)
 int
 main(int argc, char *argv[])
 {
+    int i = 0;
     char a[INPUT_LEN];
     char b[INPUT_LEN];
     Board *board;
@@ -357,7 +377,7 @@ main(int argc, char *argv[])
         input(a, INPUT_LEN);
         input(b, INPUT_LEN);
         bb_addnode(board, bb_op_add(a, b));
-        bb_playboard(board);
+        bb_playboard(board, i++);
     }
 
     bb_delboard(board);
