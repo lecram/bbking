@@ -9,7 +9,9 @@ endif
 
 objects = anim.o board.o bbk.o
 
-dist : $(objects)
+dist : bbk
+
+bbk : $(objects)
 	$(CC) $(CFLAGS) $(objects) $(CLINK) -o bbk
 
 anim.o : anim.h anim.c
